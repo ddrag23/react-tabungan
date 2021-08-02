@@ -1,6 +1,11 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { AuthMiddleware } from '../../middleware'
 import { validate, renderFeedback, onNotif } from '../../utils'
+
 function Login() {
+  const history = useHistory()
+  const { dispatch } = useContext(AuthMiddleware)
   const [form, setForm] = useState({
     username: '',
     password: '',
@@ -17,10 +22,18 @@ function Login() {
       await window.$api.get('http://localhost/tabunganku/sanctum/csrf-cookie')
       const res = await window.$api.post('login', form)
       const data = res.data
-      if (data.errors === undefined) {
+      if (data.success) {
         icon = 'success'
         title = 'Berhasil!'
-        console.log(data)
+        dispatch({
+          type: 'LOGIN',
+          payload: {
+            isAuth: true,
+            user: data.user,
+            token: data.token,
+          },
+        })
+        history.push('/withdraw')
       } else {
         icon = 'error'
         title = 'Gagal!'

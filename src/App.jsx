@@ -1,23 +1,57 @@
 // import logo from './logo.svg'
 import './App.css'
-import Layout from './components/Layout'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom'
 import { routes } from './utils'
+import NotFound from './modules/errors/NotFound'
+import { PrivateRoute } from './components/Router'
+import { useReducer } from 'react'
+import { AuthMiddleware, reducer, initialState } from './middleware'
+
 function App() {
-  const routeComponents = routes.map(({ path, component, layout }, key) => {
-    if (layout) {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const privateRoute = routes
+    .filter((item) => item.isAuth)
+    .map(({ path, component }, key) => {
       return (
-        <Layout key={key}>
-          <Route exact path={path} component={component} />
-        </Layout>
+        <PrivateRoute
+          key={key}
+          exact={path === '/' ? true : false}
+          path={path}
+          component={component}
+        />
       )
-    } else {
-      return <Route key={key} exact path={path} component={component} />
-    }
-  })
+    })
+  const publicRoute = routes
+    .filter((item) => !item.isAuth)
+    .map(({ path, component }, key) => {
+      return (
+        <Route
+          key={key}
+          exact={path === '/' ? true : false}
+          path={path}
+          component={component}
+        />
+      )
+    })
   return (
     <Router>
-      <Switch>{routeComponents}</Switch>
+      <AuthMiddleware.Provider value={{ state, dispatch }}>
+        {state.isAuth === 'true' ? (
+          <Redirect to={{ pathname: '/dashboard' }} />
+        ) : (
+          <Redirect to="/" />
+        )}
+        <Switch>
+          {publicRoute}
+          {privateRoute}
+          <Route component={NotFound} />
+        </Switch>
+      </AuthMiddleware.Provider>
     </Router>
   )
 }

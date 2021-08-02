@@ -1,5 +1,23 @@
-import { Link } from 'react-router-dom'
+import { useContext } from 'react'
+import { Link, useHistory } from 'react-router-dom'
+import { AuthMiddleware } from '../../middleware'
+import api from '../../api'
 function Navbar() {
+  const { dispatch } = useContext(AuthMiddleware)
+  const history = useHistory()
+  const handleLogout = async () => {
+    try {
+      await api.get('logout', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+      dispatch({ type: 'LOGOUT' })
+      history.push('/')
+    } catch (error) {
+      console.error(error)
+    }
+  }
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -20,12 +38,19 @@ function Navbar() {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
-              <Link className="nav-link active" aria-current="page" to="/users">
+              <Link
+                className="nav-link active"
+                aria-current="page"
+                to="/withdraw"
+              >
                 Withdraw
               </Link>
               <Link className="nav-link" to="/about">
                 Savings
               </Link>
+              <button className="btn btn-primary" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           </div>
         </div>

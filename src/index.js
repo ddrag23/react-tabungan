@@ -12,6 +12,7 @@ import withReactContent from 'sweetalert2-react-content'
 window.$swal = withReactContent(Swal)
 
 window.$api = api
+
 ReactDOM.render(
   <React.StrictMode>
     <App />

@@ -1,27 +1,28 @@
-import Dashboard from '../pages/dashboard'
-import Login from '../pages/auth/login'
+import Dashboard from '../modules/dashboard'
+import Login from '../modules/login/login'
+import Withdraw from '../modules/withdraw'
 
 const routes = [
   {
     path: '/',
     component: Login,
-    layout: false,
+    isAuth: false,
   },
   {
     path: '/about',
     component: Dashboard,
-    layout: true,
+    isAuth: true,
   },
   {
-    path: '/users',
-    component: Dashboard,
-    layout: true,
+    path: '/withdraw',
+    component: Withdraw,
+    isAuth: true,
   },
 
   {
     path: '/dashboard',
     component: Dashboard,
-    layout: true,
+    isAuth: true,
   },
 ]
 export default routes
