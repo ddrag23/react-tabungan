@@ -17,42 +17,28 @@ function App() {
   const privateRoute = routes
     .filter((item) => item.isAuth)
     .map(({ path, component }, key) => {
-      return (
-        <PrivateRoute
-          key={key}
-          exact={path === '/' ? true : false}
-          path={path}
-          component={component}
-        />
-      )
+      return <PrivateRoute key={key} exact path={path} component={component} />
     })
   const publicRoute = routes
     .filter((item) => !item.isAuth)
     .map(({ path, component }, key) => {
-      return (
-        <Route
-          key={key}
-          exact={path === '/' ? true : false}
-          path={path}
-          component={component}
-        />
-      )
+      return <Route key={key} exact path={path} component={component} />
     })
   return (
-    <Router>
-      <AuthMiddleware.Provider value={{ state, dispatch }}>
-        {state.isAuth === 'true' ? (
-          <Redirect to={{ pathname: '/dashboard' }} />
-        ) : (
-          <Redirect to="/" />
-        )}
+    <AuthMiddleware.Provider value={{ state, dispatch }}>
+      <Router>
         <Switch>
+          {/* {state.isAuth === 'true' ? (
+            <Redirect to={{ pathname: '/dashboard' }} />
+          ) : (
+            <Redirect to="/" />
+          )} */}
           {publicRoute}
           {privateRoute}
-          <Route component={NotFound} />
+          <Route path="*" component={NotFound} />
         </Switch>
-      </AuthMiddleware.Provider>
-    </Router>
+      </Router>
+    </AuthMiddleware.Provider>
   )
 }
 

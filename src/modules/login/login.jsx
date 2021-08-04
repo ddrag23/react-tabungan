@@ -4,7 +4,6 @@ import { AuthMiddleware } from '../../middleware'
 import { validate, renderFeedback, onNotif } from '../../utils'
 
 function Login() {
-  const history = useHistory()
   const { dispatch } = useContext(AuthMiddleware)
   const [form, setForm] = useState({
     username: '',
@@ -14,38 +13,36 @@ function Login() {
   })
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value })
+  const history = useHistory()
   const handleSubmit = async (e) => {
     e.preventDefault()
     let icon
     let title
-    try {
-      await window.$api.get('http://localhost/tabunganku/sanctum/csrf-cookie')
-      const res = await window.$api.post('login', form)
-      const data = res.data
-      if (data.success) {
-        icon = 'success'
-        title = 'Berhasil!'
-        dispatch({
-          type: 'LOGIN',
-          payload: {
-            isAuth: true,
-            user: data.user,
-            token: data.token,
-          },
-        })
-        history.push('/withdraw')
-      } else {
-        icon = 'error'
-        title = 'Gagal!'
-        setForm({
-          ...form,
-          errors: data.errors,
-          msg: data.message,
-        })
-      }
+    await window.$api.get('http://localhost/tabunganku/sanctum/csrf-cookie')
+    const res = await window.$api.post('login', form)
+    const data = res.data
+    if (data.success) {
+      icon = 'success'
+      title = 'Berhasil!'
+      dispatch({
+        type: 'LOGIN',
+        payload: {
+          isAuth: true,
+          user: data.user,
+          token: data.token,
+        },
+      })
       onNotif(title, icon, data.message)
-    } catch (error) {
-      console.log(error)
+      history.push('/dashboard')
+    } else {
+      icon = 'error'
+      title = 'Gagal!'
+      setForm({
+        ...form,
+        errors: data.errors,
+        msg: data.message,
+      })
+      onNotif(title, icon, data.message)
     }
   }
   return (
